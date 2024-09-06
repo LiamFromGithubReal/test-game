@@ -43,6 +43,8 @@ public class Main extends ApplicationAdapter {
     // index for drop sound in dropSoundArray
     private int soundIndex = 0;
 
+    private int bucketSpeed = 600;
+
 
     @Override
     public void create() {
@@ -92,17 +94,41 @@ public class Main extends ApplicationAdapter {
         ScreenUtils.clear(0f, 0f, 0.2f, 1f);
 
 
-
-
         if(Gdx.input.isTouched()) {
             Vector3 touchPos = new Vector3();
             touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
             camera.unproject(touchPos);
-            bucket.x = touchPos.x - 64 / 2;
-        }
 
-        if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) bucket.x -= 200 * Gdx.graphics.getDeltaTime();
-        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) bucket.x += 200 * Gdx.graphics.getDeltaTime();
+
+//            // no else because if its somehow same as mouse, do nothing
+//            if (touchPos.x - 64 / 2 - Math.abs(bucket.x) < 20) {
+//                // do nothing if mouse isnt moving and bucket has reached mouse range
+//            }
+
+            // this line below calculates the middle of the bucket relative to the mouse (using the width of the bucket)
+            // IDEALLY, the width of the bucket would be a variable instead of hard-coded 64 below, will change in
+            // future but as of right now will remain hard-coded
+            float middleTouchPosX = touchPos.x - 64/2;
+            if (middleTouchPosX > bucket.x) {
+                bucket.x += bucketSpeed * Gdx.graphics.getDeltaTime();
+                // this line (same in next statement) prevents the bucket from shaking if it has reached the mouse
+                // because it would try to go where the mouse is, would overshoot, would come back, would overshoot and
+                // this would loop, making it go right, left, right, left of the stationary mouse pointer
+                if (bucket.x > middleTouchPosX) bucket.x = middleTouchPosX;
+            } else if (middleTouchPosX < bucket.x) {
+                bucket.x -= bucketSpeed * Gdx.graphics.getDeltaTime();
+                if (bucket.x < middleTouchPosX) bucket.x = middleTouchPosX;
+            }
+
+//            // moves directly to mouse instead of a bit each frame
+//            bucket.x = touchPos.x - 64 / 2;
+        }
+        // this is here to ensure BOTH keyboard and mouse are not pressed, otherwise can be exploited and both used at
+        // same time to make the bucket go much faster
+        else {
+            if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) bucket.x -= bucketSpeed * Gdx.graphics.getDeltaTime();
+            if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) bucket.x += bucketSpeed * Gdx.graphics.getDeltaTime();
+        }
 
         if(bucket.x < 0) bucket.x = 0;
         if(bucket.x > 800 - 64) bucket.x = 800 - 64;
