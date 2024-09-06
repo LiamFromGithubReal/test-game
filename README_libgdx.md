@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # TestGame
 
 A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
@@ -31,3 +32,7 @@ Useful Gradle tasks and flags:
 
 Note that most tasks that are not specific to a single project can be run with `name:` prefix, where the `name` should be replaced with the ID of a specific project.
 For example, `core:clean` removes `build` folder only from the `core` project.
+=======
+# test-game
+trying to make a small game to practice Java
+>>>>>>> 3bcf559ff7f42e11486c285867ab696c3d9f5c76
