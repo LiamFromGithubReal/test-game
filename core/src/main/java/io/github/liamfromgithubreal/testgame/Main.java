@@ -44,6 +44,8 @@ public class Main extends ApplicationAdapter {
     private int soundIndex = 0;
 
     private int bucketSpeed = 600;
+    private int gravitySpeed = -100;
+    private int jumpSpeed = 0;
 
 
     @Override
@@ -126,20 +128,40 @@ public class Main extends ApplicationAdapter {
         // this is here to ensure BOTH keyboard and mouse are not pressed, otherwise can be exploited and both used at
         // same time to make the bucket go much faster
         else {
-            if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) bucket.x -= bucketSpeed * Gdx.graphics.getDeltaTime();
-            if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) bucket.x += bucketSpeed * Gdx.graphics.getDeltaTime();
+            if(Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) bucket.x -= bucketSpeed * Gdx.graphics.getDeltaTime();
+            if(Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) bucket.x += bucketSpeed * Gdx.graphics.getDeltaTime();
         }
 
         if(bucket.x < 0) bucket.x = 0;
         if(bucket.x > 800 - 64) bucket.x = 800 - 64;
 
 
-        if(TimeUtils.nanoTime() - lastDropTime > 1000000000) spawnRaindrop();
+
+        // if up input pressed AND bucket is on floor (y-level = 10 ...for now)
+        if((Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) && (bucket.y == 10)) {
+            // jump by setting jumpSpeed to be a high positive int
+            jumpSpeed = 1500;
+        }
+
+
+
+        bucket.y += (jumpSpeed + gravitySpeed) * Gdx.graphics.getDeltaTime();
+        jumpSpeed += gravitySpeed;
+
+        if (bucket.y < 10) {
+            bucket.y = 10;
+            jumpSpeed = 0;
+        }
+
+
+
+        if(TimeUtils.nanoTime() - lastDropTime > 500000000) spawnRaindrop();
         for (Iterator<Rectangle> iter = raindrops.iterator(); iter.hasNext(); ) {
             Rectangle raindrop = iter.next();
             raindrop.y -= 200 * Gdx.graphics.getDeltaTime();
             if(raindrop.y + 64 < 0) iter.remove();
             if(raindrop.overlaps(bucket)) {
+                if (jumpSpeed < 0) jumpSpeed = 1500;
                 // this will be used to index the dropSound array for one of 3 possible sounds, so upper bound is 3
                 // (from 0 up to but NOT including 3)
                 soundIndex = rand.nextInt(3);
