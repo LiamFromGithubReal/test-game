@@ -6,21 +6,17 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 
 public class Player {
-
     // player has hitbox (for collision) and sprite (for texture)
     Rectangle hitbox;
     Texture sprite;
-
-
     // player run speed means how fast they can run
     private int runSpeed = 600;
     // player jump speed is their current jumping speed, so while they are not jumping it is always 0,
     // then when they jump its increased, then gravitySpeed is used to lower it back down to 0, making
     // player fall back down to the ground
     private int jumpSpeed = 0;
-
+    // player gravity speed which can be adjusted independently from global gravity speed
     private int gravitySpeed = Main.gravitySpeed;
-
 
     // Player class constructer generates the sprite (using path) and hitbox, along with the size of the player
     public Player() {
@@ -56,27 +52,18 @@ public class Player {
         if(Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {
             hitbox.x += runSpeed * Gdx.graphics.getDeltaTime();
         }
-
         // check if out of bounds
         if(hitbox.x < 0) hitbox.x = 0;
         if(hitbox.x > 800 - 64) hitbox.x = 800 - 64;
-
-
-
         // if up input pressed AND player is on floor (y-level = 10 ...for now)
         if((Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) && (hitbox.y == 10)) {
             // jump by setting jumpSpeed to be a high positive int
             jumpSpeed = 1500;
         }
-
-
         // move player object up
         hitbox.y += (jumpSpeed + gravitySpeed) * Gdx.graphics.getDeltaTime();
         // add gravity (to start acting as a force against the jump)
         jumpSpeed += gravitySpeed;
-
-
-
         // if player falls below floor (y-level = 10 ...for now)
         if (hitbox.y < 10) {
             // reset them back to the correct y-level and reset jump speed to 0
@@ -85,28 +72,22 @@ public class Player {
         }
     }
 
-
-
-
-
-
-    // getter/setter methods for player attributes
+    // getter methods for player attributes
     public int getRunSpeed() {
         return runSpeed;
     }
-
     public int getJumpSpeed() {
         return jumpSpeed;
     }
-    public void setJumpSpeed(int jumpSpeed) {
-        this.jumpSpeed = jumpSpeed;
-    }
-
     public Rectangle getHitbox() {
         return hitbox;
     }
-
     public Texture getSprite() {
         return sprite;
+    }
+
+    // setter methods for player attributes
+    public void setJumpSpeed(int jumpSpeed) {
+        this.jumpSpeed = jumpSpeed;
     }
 }

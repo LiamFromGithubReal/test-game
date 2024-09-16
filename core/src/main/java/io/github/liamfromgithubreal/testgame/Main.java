@@ -24,7 +24,6 @@ import java.util.Random;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
-    private SpriteBatch batch;
     private Texture image;
 
 
@@ -42,10 +41,12 @@ public class Main extends ApplicationAdapter {
     // index for drop sound in dropSounds
     private int soundIndex = 0;
 
+    // global gravity speed (need to look into whether needs to be static, but this would be the global default gravity)
     public static int gravitySpeed = -100;
 
 
     Player player;
+    BatchHandler batchHandler;
 
 
     @Override
@@ -75,7 +76,7 @@ public class Main extends ApplicationAdapter {
 
 
 
-        batch = new SpriteBatch();
+        batchHandler = new BatchHandler();
         image = new Texture("libgdx.png");
 
         raindrops = new Array<Rectangle>();
@@ -139,6 +140,7 @@ public class Main extends ApplicationAdapter {
             raindrop.y -= 200 * Gdx.graphics.getDeltaTime();
             if(raindrop.y + 64 < 0) iter.remove();
             if(raindrop.overlaps(player.getHitbox())) {
+                // when player jump speed is less than 0 it means theyre falling
                 if (player.getJumpSpeed() < 0) player.setJumpSpeed(1500);
                 // this will be used to index the dropSound array for one of 3 possible sounds, so upper bound is 3
                 // (from 0 up to but NOT including 3)
@@ -156,13 +158,7 @@ public class Main extends ApplicationAdapter {
         camera.update();
 
 
-        batch.setProjectionMatrix(camera.combined);
-        batch.begin();
-        batch.draw(player.getSprite(), player.getHitbox().x, player.getHitbox().y);
-        for(Rectangle raindrop: raindrops) {
-            batch.draw(dropImage, raindrop.x, raindrop.y);
-        }
-        batch.end();
+        batchHandler.draw(player, raindrops, dropImage, camera);
     }
 
     private void spawnRaindrop() {
@@ -176,12 +172,14 @@ public class Main extends ApplicationAdapter {
     }
 
 
+
+    // this is to dispose objects that link to assets in the directory
     @Override
     public void dispose() {
         dropImage.dispose();
         player.getSprite().dispose();
         for (Sound s : dropSounds) s.dispose();
         rainMusic.dispose();
-        batch.dispose();
+        batchHandler.getBatch().dispose();
     }
 }
