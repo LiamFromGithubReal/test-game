@@ -42,7 +42,7 @@ public class Main extends ApplicationAdapter {
     // index for drop sound in dropSounds
     private int soundIndex = 0;
 
-    private int gravitySpeed = -100;
+    public static int gravitySpeed = -100;
 
 
     Player player;
@@ -53,6 +53,7 @@ public class Main extends ApplicationAdapter {
         // load the images for the droplet and the bucket, 64x64 pixels each
         dropImage = new Texture(Gdx.files.internal("sprites/drop/drop.png"));
 
+        // create player object
         player = new Player();
 
         String dropSoundPath = new String("sounds/drop/drop_#.mp3");
@@ -88,62 +89,47 @@ public class Main extends ApplicationAdapter {
         ScreenUtils.clear(0f, 0f, 0.2f, 1f);
 
 
-        if(Gdx.input.isTouched()) {
-            Vector3 touchPos = new Vector3();
-            touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-            camera.unproject(touchPos);
-
-
-//            // no else because if its somehow same as mouse, do nothing
-//            if (touchPos.x - 64 / 2 - Math.abs(bucket.x) < 20) {
-//                // do nothing if mouse isnt moving and bucket has reached mouse range
+//        //  scrapped code, will probably not use mouse to move as development progresses
+//        if(Gdx.input.isTouched()) {
+//            Vector3 touchPos = new Vector3();
+//            touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+//            camera.unproject(touchPos);
+//
+//
+////            // no else because if its somehow same as mouse, do nothing
+////            if (touchPos.x - 64 / 2 - Math.abs(bucket.x) < 20) {
+////                // do nothing if mouse isnt moving and bucket has reached mouse range
+////            }
+//
+//            // this line below calculates the middle of the bucket relative to the mouse (using the width of the bucket)
+//            // IDEALLY, the width of the bucket would be a variable instead of hard-coded 64 below, will change in
+//            // future but as of right now will remain hard-coded
+//            float middleTouchPosX = touchPos.x - 64/2;
+//            if (middleTouchPosX > player.getHitbox().x) {
+//                player.getHitbox().x += player.getRunSpeed() * Gdx.graphics.getDeltaTime();
+//                // this line (same in next statement) prevents the bucket from shaking if it has reached the mouse
+//                // because it would try to go where the mouse is, would overshoot, would come back, would overshoot and
+//                // this would loop, making it go right, left, right, left of the stationary mouse pointer
+//                if (player.getHitbox().x > middleTouchPosX) player.getHitbox().x = middleTouchPosX;
+//            } else if (middleTouchPosX < player.getHitbox().x) {
+//                player.getHitbox().x -= player.getRunSpeed() * Gdx.graphics.getDeltaTime();
+//                if (player.getHitbox().x < middleTouchPosX) player.getHitbox().x = middleTouchPosX;
 //            }
-
-            // this line below calculates the middle of the bucket relative to the mouse (using the width of the bucket)
-            // IDEALLY, the width of the bucket would be a variable instead of hard-coded 64 below, will change in
-            // future but as of right now will remain hard-coded
-            float middleTouchPosX = touchPos.x - 64/2;
-            if (middleTouchPosX > player.getHitbox().x) {
-                player.getHitbox().x += player.getRunSpeed() * Gdx.graphics.getDeltaTime();
-                // this line (same in next statement) prevents the bucket from shaking if it has reached the mouse
-                // because it would try to go where the mouse is, would overshoot, would come back, would overshoot and
-                // this would loop, making it go right, left, right, left of the stationary mouse pointer
-                if (player.getHitbox().x > middleTouchPosX) player.getHitbox().x = middleTouchPosX;
-            } else if (middleTouchPosX < player.getHitbox().x) {
-                player.getHitbox().x -= player.getRunSpeed() * Gdx.graphics.getDeltaTime();
-                if (player.getHitbox().x < middleTouchPosX) player.getHitbox().x = middleTouchPosX;
-            }
-
-//            // moves directly to mouse instead of a bit each frame
-//            bucket.x = touchPos.x - 64 / 2;
-        }
-        // this is here to ensure BOTH keyboard and mouse are not pressed, otherwise can be exploited and both used at
-        // same time to make the bucket go much faster
-        else {
-            if(Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) player.getHitbox().x -= player.getRunSpeed() * Gdx.graphics.getDeltaTime();
-            if(Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) player.getHitbox().x += player.getRunSpeed() * Gdx.graphics.getDeltaTime();
-        }
-
-        if(player.getHitbox().x < 0) player.getHitbox().x = 0;
-        if(player.getHitbox().x > 800 - 64) player.getHitbox().x = 800 - 64;
+//
+////            // moves directly to mouse instead of a bit each frame
+////            bucket.x = touchPos.x - 64 / 2;
+//        }
+//        // this is here to ensure BOTH keyboard and mouse are not pressed, otherwise can be exploited and both used at
+//        // same time to make the bucket go much faster
+//        else {
+//            // this is where the keys check INSTEAD of mouse movement used to be (they were in different if/else
+//            // statements because otherwise it would do both calculations for mouse and keyboard and double-move)
+//        }
 
 
+        // calculates player movement
+        player.move();
 
-        // if up input pressed AND bucket is on floor (y-level = 10 ...for now)
-        if((Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) && (player.getHitbox().y == 10)) {
-            // jump by setting jumpSpeed to be a high positive int
-            player.setJumpSpeed(1500);
-        }
-
-
-
-        player.getHitbox().y += (player.getJumpSpeed() + gravitySpeed) * Gdx.graphics.getDeltaTime();
-        player.setJumpSpeed(player.getJumpSpeed() + gravitySpeed);
-
-        if (player.getHitbox().y < 10) {
-            player.getHitbox().y = 10;
-            player.setJumpSpeed(0);
-        }
 
 
 
