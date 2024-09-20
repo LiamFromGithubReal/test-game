@@ -1,4 +1,15 @@
+/*
+ * !!! NOTE !!!
+ * Every now and then go to:
+ *      Build > Rebuild Project
+ * to avoid silly issues like "symbol not found"
+ */
+
+
+
+
 package io.github.liamfromgithubreal.testgame;
+
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
