@@ -34,12 +34,12 @@ public class Main extends ApplicationAdapter {
     private OrthographicCamera camera;
 
     private Array<Rectangle> raindrops;
-    private long lastDropTime;
 
     // Instance of the random class
-    Random rand = new Random();
-    // index for drop sound in dropSounds
-    private int soundIndex = 0;
+    static Random rand = new Random();
+
+
+    long lastDropTime;
 
     // global gravity speed (need to look into whether needs to be static, but this would be the global default gravity)
     public static int gravitySpeed = -100;
@@ -80,7 +80,7 @@ public class Main extends ApplicationAdapter {
         image = new Texture("libgdx.png");
 
         raindrops = new Array<Rectangle>();
-        spawnRaindrop();
+        batchHandler.spawnRaindrop(raindrops);
 
 
     }
@@ -134,42 +134,32 @@ public class Main extends ApplicationAdapter {
 
 
 
-        if(TimeUtils.nanoTime() - lastDropTime > 500000000) spawnRaindrop();
-        for (Iterator<Rectangle> iter = raindrops.iterator(); iter.hasNext(); ) {
-            Rectangle raindrop = iter.next();
-            raindrop.y -= 200 * Gdx.graphics.getDeltaTime();
-            if(raindrop.y + 64 < 0) iter.remove();
-            if(raindrop.overlaps(player.getHitbox())) {
-                // when player jump speed is less than 0 it means theyre falling
-                if (player.getJumpSpeed() < 0) player.setJumpSpeed(1500);
-                // this will be used to index the dropSound array for one of 3 possible sounds, so upper bound is 3
-                // (from 0 up to but NOT including 3)
-                soundIndex = rand.nextInt(3);
-                // play drop sound at random index
-                dropSounds[soundIndex].play();
-                // remove rain drop as it collided with bucket
-                iter.remove();
-            }
 
+        // render rain if last drop was a while ago
+        if(TimeUtils.nanoTime() - lastDropTime > 500000000) {
+            lastDropTime = batchHandler.spawnRaindrop(raindrops);
         }
+        // loop for all rain drops (checks for collisions with player)
+        batchHandler.rainLoop(raindrops, player, dropSounds);
 
+        // draw the batch (for now just rain, the player is need to account for collisions but this will change)
+        batchHandler.draw(player, raindrops, dropImage, camera);
 
-
+        // update camera to display
         camera.update();
 
 
-        batchHandler.draw(player, raindrops, dropImage, camera);
     }
 
-    private void spawnRaindrop() {
-        Rectangle raindrop = new Rectangle();
-        raindrop.x = MathUtils.random(0, 800-64);
-        raindrop.y = 480;
-        raindrop.width = 64;
-        raindrop.height = 64;
-        raindrops.add(raindrop);
-        lastDropTime = TimeUtils.nanoTime();
-    }
+//    private void spawnRaindrop() {
+//        Rectangle raindrop = new Rectangle();
+//        raindrop.x = MathUtils.random(0, 800-64);
+//        raindrop.y = 480;
+//        raindrop.width = 64;
+//        raindrop.height = 64;
+//        raindrops.add(raindrop);
+//        lastDropTime = TimeUtils.nanoTime();
+//    }
 
 
 

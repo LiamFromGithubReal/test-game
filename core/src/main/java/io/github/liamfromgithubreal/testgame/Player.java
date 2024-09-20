@@ -16,7 +16,7 @@ public class Player {
     // player fall back down to the ground
     private int jumpSpeed = 0;
     // player gravity speed which can be adjusted independently from global gravity speed
-    private int gravitySpeed = Main.gravitySpeed;
+    private int gravitySpeed = -100;
 
     // Player class constructer generates the sprite (using path) and hitbox, along with the size of the player
     public Player() {
